@@ -124,13 +124,16 @@ def set_or_change_data(bot, update):
         cur.execute("UPDATE CLIENTS SET login=?, password=?, db_name=? WHERE chat_id=?",
                     (login, password, db_name, str(update.message.chat_id)))
         conn.commit()
+        update.message.reply_text('Data updated, you can start monitoring', reply_markup=ReplyKeyboardMarkup(
+            [['/monitoring'], ['/set']]))
+        return MONITORING
     else:
         cur.execute("INSERT INTO CLIENTS(chat_id, login, password, db_name) values (?, ?, ?, ?)",
                     (str(update.message.chat_id), login, password, db_name,))
         conn.commit()
-    update.message.reply_text('Data updated, you can start monitoring', reply_markup=ReplyKeyboardMarkup(
-        [['/monitoring'], ['/set']]))
-    return MONITORING
+        update.message.reply_text('Data added, you can start monitoring', reply_markup=ReplyKeyboardMarkup(
+            [['/monitoring'], ['/set']]))
+        return MONITORING
 
 
 def stay_data(bot, update):
