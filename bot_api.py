@@ -25,6 +25,14 @@ password = {}
 Do you want to change it?"""
 
 db_name_prj = 'TestDB.db'
+# after first start program delete -->
+conn = sqlite3.connect(db_name_prj)
+cur = conn.cursor()
+cur.execute('''CREATE TABLE CLIENTS
+             ([generated_id] INTEGER PRIMARY KEY,[chat_id] text, [login] text, [password] text, [db_name] text )''')
+conn.commit()
+# <--
+
 
 # Prepare the connection to the server
 # odoo = odoorpc.ODOO('localhost', port=8069)
