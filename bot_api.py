@@ -117,6 +117,7 @@ def set_data(bot, update):
                     (str(update.message.chat_id), login, password, db_name,))
         conn.commit()
         print(db_name, login, password)
+        update.message.reply_text('Data was added')
         return MONITORING
     else:
         login, password, db_name = \
