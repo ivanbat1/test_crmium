@@ -1,5 +1,4 @@
 import logging
-
 from telegram import ReplyKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, RegexHandler
 import odoorpc
@@ -24,6 +23,8 @@ db_name = {},
 login = {},
 password = {}
 Do you want to change it?"""
+
+db_name_prj = 'TestDB.db'
 
 # Prepare the connection to the server
 # odoo = odoorpc.ODOO('localhost', port=8069)
@@ -86,7 +87,7 @@ class Monitor():
 def start(bot, update):
     """the first step is to check if the user is in db"""
     global start_message
-    conn = sqlite3.connect('TestDB.db')
+    conn = sqlite3.connect(db_name_prj)
     cur = conn.cursor()
     if [i for i in cur.execute("SELECT login, password, db_name FROM CLIENTS WHERE chat_id=?",
                                (str(update.message.chat_id),))]:
@@ -107,7 +108,7 @@ def start(bot, update):
 def set_data(bot, update):
     """if after the first step user print any text
      the program will offer to change the data or add to the db if the data is correct"""
-    conn = sqlite3.connect('TestDB.db')
+    conn = sqlite3.connect(db_name_prj)
     cur = conn.cursor()
     if not [i for i in cur.execute("SELECT login, password, db_name FROM CLIENTS WHERE chat_id=?",
                                    (str(update.message.chat_id),))]:
@@ -142,7 +143,7 @@ def take_data(bot, update):
 
 def change_data(bot, update):
     """change if there is no user or come in if the user was"""
-    conn = sqlite3.connect('TestDB.db')
+    conn = sqlite3.connect(db_name_prj)
     cur = conn.cursor()
     db_name, login, password = update.message.text.split(', ')
     if [i for i in cur.execute("SELECT login, password, db_name FROM CLIENTS WHERE chat_id=?",
@@ -183,7 +184,7 @@ def monitoring(bot, job):
 def time(bot, update, job_queue):
     """start monitoring"""
     print(update.message.chat_id)
-    conn = sqlite3.connect('TestDB.db')
+    conn = sqlite3.connect(db_name_prj)
     cur = conn.cursor()
     if [i for i in cur.execute("SELECT login, password, db_name FROM CLIENTS WHERE chat_id=?",
                                (str(update.message.chat_id),))]:
