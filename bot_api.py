@@ -30,6 +30,8 @@ db_name_prj = 'TestDB.db'
 # odoo = odoorpc.ODOO('localhost', port=8069)
 # bot TOKEN to connect
 TOKEN = "733869210:AAGp_7UWMW-7HWdj78zRqY3DAFL9ZW_4tnk"
+
+
 # data = ['api', 'baturin.ivan9@gmail.com', 'Ivanbaturin1999']
 
 
@@ -117,7 +119,8 @@ def set_data(bot, update):
                     (str(update.message.chat_id), login, password, db_name,))
         conn.commit()
         print(db_name, login, password)
-        update.message.reply_text('Data was added')
+        update.message.reply_text('Data was added', reply_markup=ReplyKeyboardMarkup(
+            [['/monitoring'], ['/set']]))
         return MONITORING
     else:
         login, password, db_name = \
@@ -164,7 +167,7 @@ def change_data(bot, update):
 def stay_data(bot, update):
     """user refused changes"""
     update.message.reply_text('Data was not updated', reply_markup=ReplyKeyboardMarkup(
-            [['/monitoring'], ['/set']]))
+        [['/monitoring'], ['/set']]))
     return MONITORING
 
 
@@ -204,7 +207,7 @@ def time(bot, update, job_queue):
         m.once_crm()
         job_queue.start()
         job_queue.run_repeating(monitoring, 1,
-                                      context={"update": update, 'm': m})
+                                context={"update": update, 'm': m})
         update.message.reply_text('start', reply_markup=ReplyKeyboardMarkup(
             [['/stop']]))
     return MONITORING
