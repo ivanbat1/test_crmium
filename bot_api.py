@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 MONITORING, CHANGE_DATA, UPDATE_DATA = range(3)
 
 start_message = """This bot is monitoring Odoo leads
-pleas enter you data in this format:
-db_name, login, password
+pleas click button:
+/set and carry out requirements
 and i connect to you account"""
 
 start_message_v2 = """This bot is monitoring Odoo leads
@@ -107,37 +107,6 @@ def start(bot, update):
         return CHANGE_DATA
 
 
-def set_data(bot, update):
-    """if after the first step user print any text
-     the program will offer to change the data or add to the db if the data is correct"""
-    conn = sqlite3.connect(db_name_prj)
-    cur = conn.cursor()
-    if not [i for i in cur.execute("SELECT login, password, db_name FROM CLIENTS WHERE chat_id=?",
-                                   (str(update.message.chat_id),))]:
-        db_name, login, password = update.message.text.split(', ')
-        cur.execute("INSERT INTO CLIENTS(chat_id, login, password, db_name) values (?, ?, ?, ?)",
-                    (str(update.message.chat_id), login, password, db_name,))
-        conn.commit()
-        print(db_name, login, password)
-        update.message.reply_text('Data was added', reply_markup=ReplyKeyboardMarkup(
-            [['/monitoring'], ['/set']]))
-        return MONITORING
-    else:
-        login, password, db_name = \
-            [i for i in cur.execute("SELECT login, password, db_name FROM CLIENTS WHERE chat_id=?",
-                                    (str(update.message.chat_id),))][0]
-        update.message.reply_text(
-            f"""Your information is already stored in the database:
-            db_name = {db_name},
-            login = {login},
-            password = {password},
-            Do you want to change it?""",
-            reply_markup=ReplyKeyboardMarkup(
-                [['/yes'], ['/no']]))
-        conn.commit()
-        return CHANGE_DATA
-
-
 def take_data(bot, update):
     """the program requests user data"""
     update.message.reply_text('''Enter your data in this format:
@@ -145,7 +114,7 @@ def take_data(bot, update):
     return UPDATE_DATA
 
 
-def change_data(bot, update):
+def set_or_change_data(bot, update):
     """change if there is no user or come in if the user was"""
     conn = sqlite3.connect(db_name_prj)
     cur = conn.cursor()
@@ -219,7 +188,8 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            MONITORING: [MessageHandler(Filters.text, set_data),
+            MONITORING: [
+                # MessageHandler(Filters.text, set_data),
                          CommandHandler('monitoring', time, pass_job_queue=True),
                          CommandHandler('stop', stop, pass_job_queue=True),
                          CommandHandler(['yes', 'set'], take_data)
@@ -227,7 +197,7 @@ def main():
             CHANGE_DATA: [CommandHandler(['yes', 'set'], take_data),
                           CommandHandler('no', stay_data),
                           ],
-            UPDATE_DATA: [MessageHandler(Filters.text, change_data), ]
+            UPDATE_DATA: [MessageHandler(Filters.text, set_or_change_data), ]
         },
         fallbacks=[]
     )
