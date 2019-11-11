@@ -118,22 +118,27 @@ def set_or_change_data(bot, update):
     """change if there is no user or come in if the user was"""
     conn = sqlite3.connect(db_name_prj)
     cur = conn.cursor()
-    db_name, login, password = update.message.text.split(', ')
-    if [i for i in cur.execute("SELECT login, password, db_name FROM CLIENTS WHERE chat_id=?",
-                               (str(update.message.chat_id),))]:
-        cur.execute("UPDATE CLIENTS SET login=?, password=?, db_name=? WHERE chat_id=?",
-                    (login, password, db_name, str(update.message.chat_id)))
-        conn.commit()
-        update.message.reply_text('Data updated, you can start monitoring', reply_markup=ReplyKeyboardMarkup(
-            [['/monitoring'], ['/set']]))
-        return MONITORING
-    else:
-        cur.execute("INSERT INTO CLIENTS(chat_id, login, password, db_name) values (?, ?, ?, ?)",
-                    (str(update.message.chat_id), login, password, db_name,))
-        conn.commit()
-        update.message.reply_text('Data added, you can start monitoring', reply_markup=ReplyKeyboardMarkup(
-            [['/monitoring'], ['/set']]))
-        return MONITORING
+    try:
+        db_name, login, password = update.message.text.split(', ')
+        if [i for i in cur.execute("SELECT login, password, db_name FROM CLIENTS WHERE chat_id=?",
+                                   (str(update.message.chat_id),))]:
+            cur.execute("UPDATE CLIENTS SET login=?, password=?, db_name=? WHERE chat_id=?",
+                        (login, password, db_name, str(update.message.chat_id)))
+            conn.commit()
+            update.message.reply_text('Data updated, you can start monitoring', reply_markup=ReplyKeyboardMarkup(
+                [['/monitoring'], ['/set']]))
+            return MONITORING
+        else:
+            cur.execute("INSERT INTO CLIENTS(chat_id, login, password, db_name) values (?, ?, ?, ?)",
+                        (str(update.message.chat_id), login, password, db_name,))
+            conn.commit()
+            update.message.reply_text('Data added, you can start monitoring', reply_markup=ReplyKeyboardMarkup(
+                [['/monitoring'], ['/set']]))
+            return MONITORING
+    except ValueError:
+        update.message.reply_text('Enter the data in the correct format')
+
+
 
 
 def stay_data(bot, update):
