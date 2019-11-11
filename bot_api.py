@@ -25,13 +25,13 @@ password = {}
 Do you want to change it?"""
 
 db_name_prj = 'TestDB.db'
-# after first start program delete -->
-conn = sqlite3.connect(db_name_prj)
-cur = conn.cursor()
-cur.execute('''CREATE TABLE CLIENTS
-             ([generated_id] INTEGER PRIMARY KEY,[chat_id] text, [login] text, [password] text, [db_name] text )''')
-conn.commit()
-# <--
+# # after first start program delete -->
+# conn = sqlite3.connect(db_name_prj)
+# cur = conn.cursor()
+# cur.execute('''CREATE TABLE CLIENTS
+#              ([generated_id] INTEGER PRIMARY KEY,[chat_id] text, [login] text, [password] text, [db_name] text )''')
+# conn.commit()
+# # <--
 
 
 # Prepare the connection to the server
@@ -44,12 +44,9 @@ TOKEN = "733869210:AAGp_7UWMW-7HWdj78zRqY3DAFL9ZW_4tnk"
 
 
 class Monitor():
-    crm = []
-    odoo = None
-    search = []
 
     def __init__(self, db, login, pasw):
-        self.db, self.login, self.pasw = db, login, pasw
+        self.db, self.login, self.pasw, self.search, self.odoo, self.crm = db, login, pasw, [], None, []
 
     def log(self):
         """profile authorization odoo"""
@@ -147,8 +144,6 @@ def set_or_change_data(bot, update):
         update.message.reply_text('Enter the data in the correct format')
 
 
-
-
 def stay_data(bot, update):
     """user refused changes"""
     update.message.reply_text('Data was not updated', reply_markup=ReplyKeyboardMarkup(
@@ -206,10 +201,10 @@ def main():
         states={
             MONITORING: [
                 # MessageHandler(Filters.text, set_data),
-                         CommandHandler('monitoring', time, pass_job_queue=True),
-                         CommandHandler('stop', stop, pass_job_queue=True),
-                         CommandHandler(['yes', 'set'], take_data)
-                         ],
+                CommandHandler('monitoring', time, pass_job_queue=True),
+                CommandHandler('stop', stop, pass_job_queue=True),
+                CommandHandler(['yes', 'set'], take_data)
+            ],
             CHANGE_DATA: [CommandHandler(['yes', 'set'], take_data),
                           CommandHandler('no', stay_data),
                           ],
